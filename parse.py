@@ -8,6 +8,7 @@ file_name = 'failed-apis.csv'
 url = 'https://api.hubapi.com/deals/v1/deal/'
 headers = {'content-type': 'application/json', 'Accept-Charset': 'UTF-8', 'Authorization': 'Bearer {}'.format(api_key.hubspot_api_key)}
 processed = []
+errors = []
 
 try:
     # Open the CSV file
@@ -43,13 +44,19 @@ try:
                         processed.append(name)
                         print(name)
     
-                        # Post to hubspot
-                        # r = requests.post(url, data=payload, headers=headers)
-                        # print(r)
-                        # exit()
+                        try:
+                            # Post to hubspot
+                            r = requests.post(url, data=payload, headers=headers)
+                            print(r)
+                        except Exception as post_error:
+                            print(f"Error posting to Hubspot: {name} - {post_error}")
+                            errors.append(name)
+
 
         count = len(processed)
-        print(f"Processed {count} rows.")
+        print(f"Processed: {count} rows.")
+        count = len(errors)
+        print(f"Failed: {count} rows.")
 
 except FileNotFoundError:
     print(f"Error: The file '{file_name}' was not found.")
